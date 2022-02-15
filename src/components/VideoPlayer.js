@@ -11,6 +11,7 @@ const VideoPlayer = ({ video }) => {
       src={`https://www.youtube.com/embed/${video.id.videoId}`}
       title={video.snippet.title}
       frameBorder="0"
+      allowFullScreen
       height="100%"
       width="100%"
     ></iframe>

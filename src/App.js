@@ -1,9 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import SearchBar from './components/SearchBar';
-import VideoPlayer from './components/VideoPlayer';
-import VideoItem from './components/VideoItem';
-import VideoList from './components/VideoList';
 import axios from 'axios';
+import ErrorLoader from './components/ErrorLoader';
+import ResultsDisplay from './components/ResultsDisplay';
 
 const YOUTUBE_API_KEY = `${process.env.REACT_APP_YOUTUBE_API_KEY.toString()}`; /* Replace with your own API key from the YouTube API. */
 
@@ -12,10 +11,8 @@ const App = () => {
   const [hasError, setHasError] = useState(false);
   const [video, setVideo] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [term, setTerm] = useState('');
 
   const onSearchSubmit = useCallback(async (term) => {
-    // console.log(term);
     try {
       const response = await axios.get(
         'https://www.googleapis.com/youtube/v3/search',
@@ -37,8 +34,6 @@ const App = () => {
         setError(error);
         setHasError(true);
       } else {
-        console.log(response.data);
-
         setVideo(response.data.items[0]);
         setVideos(response.data.items);
         setHasError(false);
@@ -55,27 +50,20 @@ const App = () => {
 
   return (
     <div className="ui container">
-      <SearchBar onSubmit={onSearchSubmit} />
-      {videos.length > 0 ? (
-        <div className="ui two column doubling stackable padded grid container">
-          <div className="column">
-            <VideoList
-              onSelectedVideo={onSelectedVideo}
-              video={video}
-              videos={videos}
-            />
-          </div>
+      <h1 className="ui center aligned header">
+        React App - YouTube Search - Hooks
+      </h1>
 
-          <div className="column">
-            <VideoPlayer video={video} />
-          </div>
-        </div>
+      <SearchBar onSubmit={onSearchSubmit} />
+
+      {videos.length > 0 && !hasError ? (
+        <ResultsDisplay
+          video={video}
+          videos={videos}
+          onSelectedVideo={onSelectedVideo}
+        />
       ) : (
-        <div className="ui center aligned header">
-          <div className="ui active centered inline text loader">
-            Waiting for user input...
-          </div>
-        </div>
+        <ErrorLoader hasError={hasError} error={error} />
       )}
     </div>
   );
